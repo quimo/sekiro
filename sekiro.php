@@ -19,13 +19,14 @@ class Sekiro {
         add_action('wp_enqueue_scripts', array($this, 'init'));     	
         add_action('admin_menu', array($this, 'add_settings_page'));      	
 
-        /* azioni ajax */
-        add_action('wp_ajax_nopriv_hello_world_ajax', array($this, 'hello_world_ajax'));
-        add_action('wp_ajax_hello_world_ajax', array($this, 'hello_world_ajax'));
-
         /* attivazione e disattivazione plugin */
         register_activation_hook(__FILE__, array($this, 'activation'));
         register_deactivation_hook( __FILE__, array($this, 'deactivation'));
+
+        /* impostazione del ruolo "nullo" come default all'iscrizione */
+        add_filter('pre_option_default_role', function($default_role) {
+            return '';
+        });
     }
 
     function activation(){
@@ -34,12 +35,11 @@ class Sekiro {
 
     function deactivation(){
         $this->remove_settings();
-	  }
+	}
 
     function init() {
         wp_enqueue_style( 'sekiro', plugin_dir_url( __FILE__ ) . 'assets/css/style.css' , array(), mt_rand());
         wp_enqueue_script('sekiro', plugin_dir_url( __FILE__ ) . 'assets/js/sekiro.js', array('jquery'), mt_rand(), true);
-        wp_localize_script('init', 'init_ajax', array('url' => admin_url( 'admin-ajax.php' )));
     }
 
     function hello_world_ajax() {
