@@ -14,14 +14,15 @@
 
 class Sekiro {
 
-    private $data;
+    private $data = array();
+    private $data_counter = 0;
 
     function __construct() {
         
         add_action('init', array($this, 'init'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue'));     	
         add_action('admin_menu', array($this, 'add_settings_page'));
-        add_shortcode('sekiro_area_riservata','render_docs');      	
+        add_shortcode('sekiro_area_riservata', array($this, 'render_docs'));      	
 
         /* attivazione e disattivazione plugin */
         register_activation_hook(__FILE__, array($this, 'activation'));
@@ -136,9 +137,46 @@ class Sekiro {
         return $options;
     }
 
+    /** get_data
+     *  recupero i dati dal pod 'documenti'
+     */
     function get_data() {
-        /* recupero i dati dal pod */
-        $this->data = '';
+
+        $logged_user = get_userdata(get_current_user_id());
+        $user_email = $logged_user->user_email;
+        
+        $query = new WP_query (array(
+            'nopaging' => 'true',
+            'posts_per_page' => -1,
+            'post_type' => 'documento'
+        ));
+
+        if ($query->have_posts()) {
+            $k = 0;
+            while ($query->have_posts()) {
+                $query->the_post();
+                $documento = pods('documento', get_the_id()); // recupero il pod
+                $allegato = $documento->display('sekiro_allegato');
+                $utenti = $documento->field('sekiro_utenti'); // recupero la relazione
+                if (!empty($utenti)) {
+                    for ($i = 0; $i < count($utenti); $i++) {
+                        $email = $utenti[$i]['user_email'];
+                        if ($user_email == $email) {
+                            //salvo il dato
+                            $this->data[$k]['post_title'] = get_the_title();
+                            $this->data[$k]['post_content'] = get_the_content();
+                            $this->data[$k]['sekiro_allegato'] = $allegato;
+                            $k++;
+                            break;
+                        }
+                    }
+
+                }
+            }
+        }
+        wp_reset_query();
+        wp_reset_postdata();
+        return $this->data;
     }
 
 
@@ -151,7 +189,26 @@ class Sekiro {
                 $atts, 'sekiro_area_riservata'
             ) 
         );
-        //$data = $this->get_data();
+        ob_start();
+        $data = $this->get_data();
+        if (!empty($data)) {
+            $html = '<div class="sekiro">';
+            $tmpl_url = plugin_dir_url( __FILE__ ) . 'assets/templates/sekiro.html';
+            $template = @file_get_contents($tmpl_url);
+            for ($i = 0; $i < count($data); $i++) {
+                $this->data_counter = $i;
+                $item = $template;
+                $item = preg_replace_callback('/\[\+(.+)\+\]/', function($matches) {
+                    $dummy = $matches[1];
+                    return $this->data[$this->data_counter][$dummy];
+                }, $item);
+                $html .= $item;
+            }
+
+        }
+        echo $html . '</div>';
+		return ob_get_clean();
+        
     }
 
 }
