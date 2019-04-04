@@ -89,7 +89,7 @@ class Sekiro {
             'Sekiro',
             'Sekiro',
             'manage_options',
-            'cabi-settings-page',
+            'sekiro-settings-page',
             array($this,'render_settings_page')
         );
     }
