@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Sekiro
  * Plugin URI: https://github.com/quimo/sekiro
- * Description: Area riservata
- * Version: 0.8
+ * Description: Trasforma una pagina del sito in un'area riservata. Ogni singola risorsa aggiunta all'area riservata (file, immagine o video) può essere resa visibile a un singolo utente o a una lista di utenti "subscriber". Solo gli utenti approvati dall'amministratore possono accedere all'area riservata. Richiede il plugin <a href="https://pods.io">Pods</a>.
+ * Version: 0.9
  * Author: Simone Alati
  * Author URI: https://www.simonealati.it
  * Text Domain: sekiro
@@ -49,6 +49,17 @@ class Sekiro {
 
     function activation(){
         $this->add_settings();
+
+        if (function_exists('pods')) pods_require_component('migrate-packages');
+        if (!function_exists('pods_api')) return;
+
+
+        $json_url = plugin_dir_url( __FILE__ ) . 'assets/json/documento.json';
+        $json = @file_get_contents($json_url);
+
+        pods_api()->import_package($json);
+        pods_api()->cache_flush_pods();
+        pods_api()->load_pods();
     }
 
     function deactivation(){
