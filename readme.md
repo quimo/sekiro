@@ -9,7 +9,7 @@ Per impedire l'accesso diretto ai file dell'area riservata basta creare un file 
 ```RewriteEngine On
 RewriteCond %{REQUEST_URI} !hotlink\.(gif|png|jpg|doc|xls|pdf|html|htm|xlsx|docx|mp4|mov) [NC]
 RewriteCond %{HTTP_COOKIE} !^.*wordpress_logged_in.*$ [NC]
-RewriteRule .*\.(doc|xls|pdf|xlsx|docx|zip)$ https://www.iltuosito.it/ [NC]
+RewriteRule .*\.(doc|xls|pdf|xlsx|docx|zip)$ https://%{SERVER_NAME}/ [NC]
 ```
 
 
