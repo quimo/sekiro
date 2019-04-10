@@ -7,10 +7,9 @@ Trasforma una pagina del sito in un'area riservata. Ogni singola risorsa aggiunt
 Per impedire l'accesso diretto ai file dell'area riservata basta creare un file `.htaccess` nella cartella `/wp-content/uploads/` con questo contenuto:
 
 ```RewriteEngine On
-RewriteCond %{HTTP_REFERER} !^http://%{SERVER_NAME}/ [NC]
 RewriteCond %{REQUEST_URI} !hotlink\.(gif|png|jpg|doc|xls|pdf|html|htm|xlsx|docx|mp4|mov) [NC]
 RewriteCond %{HTTP_COOKIE} !^.*wordpress_logged_in.*$ [NC]
-RewriteRule .*\.(gif|png|jpg|doc|xls|pdf|html|htm|xlsx|docx|mp4|mov)$ http://%{SERVER_NAME}/ [NC]
+RewriteRule .*\.(doc|xls|pdf|xlsx|docx|zip)$ https://www.iltuosito.it/ [NC]
 ```
 
 
