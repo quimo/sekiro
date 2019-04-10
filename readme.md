@@ -4,7 +4,7 @@ Trasforma una pagina del sito in un'area riservata. Ogni singola risorsa aggiunt
 
 ## Proteggere la cartella uploads
 
-Per impedire l'accesso diretto ai file dell'area riservata basta creare un file `.htaccess` nella cartella `/wp-content/uploads/` con questo contenuto:
+Per impedire l'accesso diretto ai file dell'area riservata basta creare un file `.htaccess` nella cartella `/wp-content/` con questo contenuto:
 
 ```RewriteEngine On
 RewriteCond %{REQUEST_URI} !hotlink\.(gif|png|jpg|doc|xls|pdf|html|htm|xlsx|docx|mp4|mov) [NC]
